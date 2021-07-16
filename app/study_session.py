@@ -27,6 +27,8 @@ class StudyInstance:
 
     def _handle_failure(self) -> None:
         message = "Incorrect. Would you like to see the answer?"
+        if self.record_results:
+            self.flashcard.history.record_failure()
         try:
             wants_to_see_answer = self.cli.prompt_with_yes_no_question(message)
             if wants_to_see_answer:
@@ -48,7 +50,7 @@ class StudySession:
         cls, args: Args, db_filepath: str, db_schema_filepath: str, cli: CLI
     ) -> StudySession:
         db = Database.from_filepaths(db_filepath, db_schema_filepath)
-        return cls(db.get_collection(args.collection), cli, args.do_not_remember)
+        return cls(db.get_collection(args.collection), cli, not args.do_not_remember)
 
     def do(self) -> None:
         self.cli.print(
