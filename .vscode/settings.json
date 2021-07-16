@@ -1,0 +1,10 @@
+{
+    "python.sortImports.args": [
+        "--settings-path=${workspaceFolder}/setup.cfg"
+    ],
+    "[python]": {
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        }
+    }
+}
