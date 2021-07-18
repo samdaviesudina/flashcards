@@ -28,7 +28,7 @@ class EditingSession:
             self.cli.print("Now let's add some flashcards!")
         else:
             action = self.cli.prompt(
-                "Do you want to add a flashcard, edit an existing one, "
+                "Do you want to add a flashcard, edit an existing one,"
                 " or delete an existing one?",
                 ["add", "edit", "delete"],
             )
@@ -56,9 +56,15 @@ class EditingSession:
                 break
 
     def _do_deleting(self) -> None:
+        if len(self.collection) == 0:
+            self.cli.print("There are no flashcards to delete.")
+            return
         self.cli.print("These are the flashcards in your collection:")
         self._display_all_flashcards_in_collection()
         while True:
+            if len(self.collection) == 0:
+                self.cli.print("There are no flashcards to delete.")
+                break
             flashcard_id = int(
                 self.cli.prompt("Type in the ID of the flashcard you'd like to delete:")
             )
