@@ -221,6 +221,9 @@ class Collection:
 
     def delete_flashcard(self, flashcard_id: int) -> None:
         self.db.delete_flashcard(flashcard_id)
+        self.flashcards = [
+            flashcard for flashcard in self.flashcards if flashcard.id != flashcard_id
+        ]
 
 
 @dataclass
