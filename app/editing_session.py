@@ -28,8 +28,8 @@ class EditingSession:
             self.cli.print("Now let's add some flashcards!")
         else:
             action = self.cli.prompt(
-                "What do you want to do: add a flashcard, edit an existing one"
-                " or delete a flashcard?",
+                "Do you want to add a flashcard, edit an existing one, "
+                " or delete an existing one?",
                 ["add", "edit", "delete"],
             )
         if action == "edit":
