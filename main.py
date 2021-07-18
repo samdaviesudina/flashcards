@@ -3,7 +3,7 @@ from argparse import Namespace as Args
 
 from app.cli import CLI
 from app.flashcard import Collection
-from app.sessions import CreateSession, EditSession, StudySession
+from app.sessions import CreatingSession, EditingSession, StudyingSession
 
 DB_FILEPATH = "db/data.db"
 DB_SCHEMA_FILEPATH = "db/schema.sql"
@@ -32,7 +32,11 @@ def prepare_arg_parser() -> ArgumentParser:
 
 def main(args: Args) -> None:
     cli = CLI()
-    commands = [StudySession.COMMAND, CreateSession.COMMAND, EditSession.COMMAND]
+    commands = [
+        StudyingSession.COMMAND,
+        CreatingSession.COMMAND,
+        EditingSession.COMMAND,
+    ]
     if args.command not in commands:
         cli.print(
             f"Unrecognised command '{args.command}'. Run flashcards --help for usage."
@@ -41,7 +45,7 @@ def main(args: Args) -> None:
 
     if args.command == "study":
         try:
-            study_session = StudySession.make(
+            study_session = StudyingSession.make(
                 args, DB_FILEPATH, DB_SCHEMA_FILEPATH, cli
             )
             study_session.do()
@@ -50,12 +54,16 @@ def main(args: Args) -> None:
             cli.print(f"Collection '{args.collection}' does not yet exist.")
             return
     if args.command == "create":
-        create_session = CreateSession.make(args, DB_FILEPATH, DB_SCHEMA_FILEPATH, cli)
+        create_session = CreatingSession.make(
+            args, DB_FILEPATH, DB_SCHEMA_FILEPATH, cli
+        )
         create_session.do()
         return
     if args.command == "edit":
         try:
-            edit_session = EditSession.make(args, DB_FILEPATH, DB_SCHEMA_FILEPATH, cli)
+            edit_session = EditingSession.make(
+                args, DB_FILEPATH, DB_SCHEMA_FILEPATH, cli
+            )
             edit_session.do()
             return
         except Collection.DoesNotExist:

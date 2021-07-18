@@ -38,7 +38,7 @@ class StudyInstance:
 
 
 @dataclass
-class StudySession:
+class StudyingSession:
     COMMAND = "study"
 
     collection: Collection
@@ -48,7 +48,7 @@ class StudySession:
     @classmethod
     def make(
         cls, args: Args, db_filepath: str, db_schema_filepath: str, cli: CLI
-    ) -> StudySession:
+    ) -> StudyingSession:
         db = Database.from_filepaths(db_filepath, db_schema_filepath)
         return cls(db.get_collection(args.collection), cli, not args.do_not_remember)
 

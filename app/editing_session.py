@@ -8,7 +8,7 @@ from app.flashcard import Answer, Collection, Database, Question
 
 
 @dataclass
-class EditSession:
+class EditingSession:
     COMMAND = "edit"
 
     collection: Collection
@@ -18,7 +18,7 @@ class EditSession:
     @classmethod
     def make(
         cls, args: Args, db_filepath: str, db_schema_filepath: str, cli: CLI
-    ) -> EditSession:
+    ) -> EditingSession:
         db = Database.from_filepaths(db_filepath, db_schema_filepath)
         return cls(db.get_collection(args.collection), cli)
 

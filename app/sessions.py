@@ -1,5 +1,5 @@
-from app.create_session import CreateSession
-from app.edit_session import EditSession
-from app.study_session import StudySession
+from app.creating_session import CreatingSession
+from app.editing_session import EditingSession
+from app.studying_session import StudyingSession
 
-__all__ = ["CreateSession", "EditSession", "StudySession"]
+__all__ = ["CreatingSession", "EditingSession", "StudyingSession"]
