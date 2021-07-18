@@ -32,7 +32,7 @@ class EditingSession:
                 " or delete a flashcard?",
                 ["add", "edit", "delete"],
             )
-        if action in ("edit", "delete"):
+        if action == "edit":
             raise NotImplementedError
         if action == "add":
             while True:
@@ -42,6 +42,15 @@ class EditingSession:
                 )
                 if not wants_to_add_another_one:
                     break
+        if action == "delete":
+            self.cli.print("These are the flashcards in your collection:")
+            for flashcard in self.collection:
+                self.cli.print(f"  {flashcard}")
+            flashcard_id = int(
+                self.cli.prompt("Type in the ID of the flashcard you'd like to delete:")
+            )
+            self.collection.delete_flashcard(flashcard_id)
+            self.cli.print(f"Flashcard with ID '{flashcard_id}' successfully deleted.")
 
     def add_flashcard(self) -> None:
         question = self.cli.prompt("What's the question?")

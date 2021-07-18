@@ -160,6 +160,13 @@ class Database:
             FlashcardHistory(flashcard_id, 0, 0, self),
         )
 
+    def delete_flashcard(self, flashcard_id: int) -> None:
+        with self.connection:
+            self.connection.execute(
+                "DELETE FROM Flashcard WHERE Id = :flashcard_id",
+                {"flashcard_id": flashcard_id},
+            )
+
 
 @dataclass
 class FlashcardHistory:
@@ -212,6 +219,9 @@ class Collection:
         flashcard = self.db.add_flashcard(self.collection_data.id, question, answer)
         self.flashcards.append(flashcard)
 
+    def delete_flashcard(self, flashcard_id: int) -> None:
+        self.db.delete_flashcard(flashcard_id)
+
 
 @dataclass
 class Flashcard:
@@ -222,4 +232,4 @@ class Flashcard:
     history: FlashcardHistory
 
     def __repr__(self) -> str:
-        return str(self.question)
+        return f"{self.id} | {self.question}"
