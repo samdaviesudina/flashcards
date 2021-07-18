@@ -26,10 +26,10 @@ class StudyInstance:
             self.flashcard.history.record_success()
 
     def _handle_failure(self) -> None:
-        message = "Incorrect. Would you like to see the answer?"
         if self.record_results:
             self.flashcard.history.record_failure()
         try:
+            message = "Incorrect. Would you like to see the answer?"
             wants_to_see_answer = self.cli.prompt_with_yes_no_question(message)
             if wants_to_see_answer:
                 self.cli.print(f"The correct answer is '{self.flashcard.answer}'.")
