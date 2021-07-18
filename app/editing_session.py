@@ -23,11 +23,16 @@ class EditingSession:
         return cls(db.get_collection(args.collection), cli)
 
     def do(self) -> None:
-        action = self.cli.prompt(
-            "What do you want to do, add a flashcard or edit an existing one?",
-            ["add", "edit"],
-        )
-        if action == "edit":
+        if self.just_created:
+            action = "add"
+            self.cli.print("Now let's add some flashcards!")
+        else:
+            action = self.cli.prompt(
+                "What do you want to do: add a flashcard, edit an existing one"
+                " or delete a flashcard?",
+                ["add", "edit", "delete"],
+            )
+        if action in ("edit", "delete"):
             raise NotImplementedError
         if action == "add":
             while True:
