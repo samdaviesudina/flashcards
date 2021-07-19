@@ -128,8 +128,17 @@ class Database:
     def add_flashcard(
         self, collection_id: int, question: Question, answer: Answer
     ) -> Flashcard:
-        # TODO: We might want to check that the question is unique.
         question_string = question.question
+        with self.connection:
+            flashcards_with_the_same_question = list(
+                self.connection.execute(
+                    "SELECT * FROM Flashcard WHERE Question = :question",
+                    {"question": question_string},
+                )
+            )
+            if flashcards_with_the_same_question:
+                raise Flashcard.AlreadyExists
+
         with self.connection:
             self.connection.execute(
                 "INSERT INTO Flashcard (CollectionId, Question, Answer)"
@@ -288,6 +297,9 @@ class Flashcard:
     question: Question
     answer: Answer
     history: FlashcardHistory
+
+    class AlreadyExists(Exception):
+        pass
 
     def __repr__(self) -> str:
         return f"{self.id} | {self.question}"

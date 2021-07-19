@@ -4,7 +4,7 @@ from argparse import Namespace as Args
 from dataclasses import dataclass
 
 from app.cli import CLI
-from app.flashcard import Answer, Collection, Database, Question
+from app.flashcard import Answer, Collection, Database, Flashcard, Question
 
 
 @dataclass
@@ -45,7 +45,13 @@ class EditingSession:
 
     def _do_adding(self) -> None:
         while True:
-            self._add_flashcard()
+            try:
+                self._add_flashcard()
+            except Flashcard.AlreadyExists:
+                self.cli.print(
+                    "A flashcard with that question already exists. Try a new one!"
+                )
+                continue
             try:
                 wants_to_add_another_one = self.cli.prompt_with_yes_no_question(
                     "Added a new flashcard. Want to add another one?"
