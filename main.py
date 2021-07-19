@@ -3,7 +3,12 @@ from argparse import Namespace as Args
 
 from app.cli import CLI
 from app.flashcard import Collection
-from app.sessions import CreatingSession, EditingSession, StudyingSession
+from app.sessions import (
+    CreatingSession,
+    DeletingSession,
+    EditingSession,
+    StudyingSession,
+)
 
 DB_FILEPATH = "db/data.db"
 DB_SCHEMA_FILEPATH = "db/schema.sql"
@@ -36,6 +41,7 @@ def main(args: Args) -> None:
         StudyingSession.COMMAND,
         CreatingSession.COMMAND,
         EditingSession.COMMAND,
+        DeletingSession.COMMAND,
     ]
     if args.command not in commands:
         cli.print(
@@ -43,32 +49,37 @@ def main(args: Args) -> None:
         )
         return
 
-    if args.command == "study":
+    if args.command == StudyingSession.COMMAND:
         try:
-            study_session = StudyingSession.make(
+            studying_session = StudyingSession.make(
                 args, DB_FILEPATH, DB_SCHEMA_FILEPATH, cli
             )
-            study_session.do()
+            studying_session.do()
             return
         except Collection.DoesNotExist:
             cli.print(f"Collection '{args.collection}' does not yet exist.")
             return
-    if args.command == "create":
-        create_session = CreatingSession.make(
+    if args.command == CreatingSession.COMMAND:
+        creating_session = CreatingSession.make(
             args, DB_FILEPATH, DB_SCHEMA_FILEPATH, cli
         )
-        create_session.do()
+        creating_session.do()
         return
-    if args.command == "edit":
+    if args.command == EditingSession.COMMAND:
         try:
-            edit_session = EditingSession.make(
+            editing_session = EditingSession.make(
                 args, DB_FILEPATH, DB_SCHEMA_FILEPATH, cli
             )
-            edit_session.do()
+            editing_session.do()
             return
         except Collection.DoesNotExist:
             cli.print(f"Collection '{args.collection}' does not yet exist.")
             return
+    if args.command == DeletingSession.COMMAND:
+        deleting_session = DeletingSession.make(
+            args, DB_FILEPATH, DB_SCHEMA_FILEPATH, cli
+        )
+        deleting_session.do()
 
 
 if __name__ == "__main__":

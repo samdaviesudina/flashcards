@@ -64,7 +64,7 @@ class Database:
         collection_id = self._get_collection_id(collection_name)
         with self.connection:
             rows = self.connection.execute(
-                "SELECT * FROM Flashcard" " WHERE CollectionId = :collection_id",
+                "SELECT * FROM Flashcard WHERE CollectionId = :collection_id",
                 {"collection_id": collection_id},
             )
 
@@ -99,6 +99,8 @@ class Database:
                     {"name": collection_name},
                 )
             )
+        if len(collection_rows) == 0:
+            raise Collection.DoesNotExist
         assert len(collection_rows) == 1
         return collection_rows[0]["Id"]
 
@@ -165,6 +167,19 @@ class Database:
             self.connection.execute(
                 "DELETE FROM Flashcard WHERE Id = :flashcard_id",
                 {"flashcard_id": flashcard_id},
+            )
+
+    def delete_collection(self, collection_name: str) -> None:
+        collection_id = self._get_collection_id(collection_name)
+        with self.connection:
+            self.connection.execute(
+                "DELETE FROM Flashcard WHERE CollectionId = :collection_id",
+                {"collection_id": collection_id},
+            )
+        with self.connection:
+            self.connection.execute(
+                "DELETE FROM Collection WHERE Id = :collection_id",
+                {"collection_id": collection_id},
             )
 
 
