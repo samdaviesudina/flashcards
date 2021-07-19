@@ -33,7 +33,7 @@ class EditingSession:
                 ["add", "edit", "delete"],
             )
         if action == "edit":
-            raise NotImplementedError
+            self._do_editing()
         if action == "add":
             self._do_adding()
         if action == "delete":
@@ -68,17 +68,9 @@ class EditingSession:
             possible_flashcard_id = self.cli.prompt(
                 "Type in the ID of the flashcard you'd like to delete:"
             )
-            possible_flashcard_id_is_invalid = False
             try:
-                flashcard_id = int(possible_flashcard_id)
+                flashcard_id = self._validate_flashcard_id(possible_flashcard_id)
             except ValueError:
-                possible_flashcard_id_is_invalid = True
-
-            existing_flashcard_ids = [flashcard.id for flashcard in self.collection]
-            if (
-                possible_flashcard_id_is_invalid
-                or possible_flashcard_id not in existing_flashcard_ids
-            ):
                 self.cli.print(
                     f"The ID '{possible_flashcard_id}' does not match"
                     " any existing flashcards. Try again!"
@@ -94,6 +86,60 @@ class EditingSession:
                     break
             except self.cli.NoAnswerProvidedError:
                 break
+
+    def _do_editing(self) -> None:
+        if len(self.collection) == 0:
+            self.cli.print("There are no flashcards to edit.")
+            return
+        self.cli.print("These are the flashcards in your collection:")
+        self._display_all_flashcards_in_collection()
+        while True:
+            possible_flashcard_id = self.cli.prompt(
+                "Type in the ID of the flashcard you'd like to edit:"
+            )
+            try:
+                flashcard_id = self._validate_flashcard_id(possible_flashcard_id)
+            except ValueError:
+                self.cli.print(
+                    f"The ID '{possible_flashcard_id}' does not match"
+                    " any existing flashcards. Try again!"
+                )
+                continue
+
+            bit_to_edit = self.cli.prompt(
+                "Would you like to edit the question, the answer, or both?",
+                ["question", "answer", "both"],
+            )
+
+            if bit_to_edit == "question":
+                new_question = self.cli.prompt("Please enter the new question:")
+                self.collection.edit_flashcard(flashcard_id, new_question=new_question)
+            if bit_to_edit == "answer":
+                new_answer = self.cli.prompt("Please enter the new answer:")
+                self.collection.edit_flashcard(flashcard_id, new_answer=new_answer)
+            if bit_to_edit == "both":
+                new_question = self.cli.prompt("Please enter the new question:")
+                new_answer = self.cli.prompt("Please enter the new answer:")
+                self.collection.edit_flashcard(
+                    flashcard_id, new_question=new_question, new_answer=new_answer
+                )
+
+            try:
+                wants_to_edit_another_one = self.cli.prompt_with_yes_no_question(
+                    f"Flashcard with ID '{flashcard_id}' successfully edited."
+                    " Want to edit another one?"
+                )
+                if not wants_to_edit_another_one:
+                    break
+            except self.cli.NoAnswerProvidedError:
+                break
+
+    def _validate_flashcard_id(self, possible_flashcard_id: str) -> int:
+        flashcard_id = int(possible_flashcard_id)
+        existing_flashcard_ids = [flashcard.id for flashcard in self.collection]
+        if flashcard_id not in existing_flashcard_ids:
+            raise ValueError
+        return flashcard_id
 
     def _add_flashcard(self) -> None:
         question = self.cli.prompt("What's the question?")

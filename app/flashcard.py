@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from sqlite3 import connect, Connection, Row
-from typing import Generator, List
+from typing import Generator, List, Optional
 
 
 @dataclass
@@ -182,6 +182,36 @@ class Database:
                 {"collection_id": collection_id},
             )
 
+    def edit_flashcard(
+        self,
+        flashcard_id: int,
+        new_question: Optional[str] = None,
+        new_answer: Optional[str] = None,
+    ) -> None:
+        with self.connection:
+            if new_question is None:
+                self.connection.execute(
+                    "UPDATE Flashcard SET Answer = :answer WHERE Id = :flashcard_id",
+                    {"answer": new_answer, "flashcard_id": flashcard_id},
+                )
+                return
+            if new_answer is None:
+                self.connection.execute(
+                    "UPDATE Flashcard SET Question = :question"
+                    " WHERE Id = :flashcard_id",
+                    {"question": new_question, "flashcard_id": flashcard_id},
+                )
+                return
+            self.connection.execute(
+                "UPDATE Flashcard SET Question = :question, Answer = :answer"
+                " WHERE Id = :flashcard_id",
+                {
+                    "question": new_question,
+                    "answer": new_answer,
+                    "flashcard_id": flashcard_id,
+                },
+            )
+
 
 @dataclass
 class FlashcardHistory:
@@ -239,6 +269,16 @@ class Collection:
         self.flashcards = [
             flashcard for flashcard in self.flashcards if flashcard.id != flashcard_id
         ]
+
+    def edit_flashcard(
+        self,
+        flashcard_id: int,
+        new_question: Optional[str] = None,
+        new_answer: Optional[str] = None,
+    ) -> None:
+        self.db.edit_flashcard(
+            flashcard_id, new_question=new_question, new_answer=new_answer
+        )
 
 
 @dataclass
