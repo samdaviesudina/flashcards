@@ -65,14 +65,25 @@ class EditingSession:
             if len(self.collection) == 0:
                 self.cli.print("There are no flashcards to delete.")
                 break
-            flashcard_id = int(
-                self.cli.prompt("Type in the ID of the flashcard you'd like to delete:")
+            possible_flashcard_id = self.cli.prompt(
+                "Type in the ID of the flashcard you'd like to delete:"
             )
-            if flashcard_id not in [flashcard.id for flashcard in self.collection]:
-                # TODO: Perhaps we should ask whether they want to try again.
+            possible_flashcard_id_is_invalid = False
+            try:
+                flashcard_id = int(possible_flashcard_id)
+            except ValueError:
+                possible_flashcard_id_is_invalid = True
+
+            existing_flashcard_ids = [flashcard.id for flashcard in self.collection]
+            if (
+                possible_flashcard_id_is_invalid
+                or possible_flashcard_id not in existing_flashcard_ids
+            ):
                 self.cli.print(
-                    f"The ID '{flashcard_id}' does not match any existing flashcards."
+                    f"The ID '{possible_flashcard_id}' does not match"
+                    " any existing flashcards. Try again!"
                 )
+                continue
             self.collection.delete_flashcard(flashcard_id)
             try:
                 wants_to_delete_another_one = self.cli.prompt_with_yes_no_question(
